@@ -1,0 +1,141 @@
+-- Create the BOOK table
+CREATE TABLE BOOK (
+    Book_id INT PRIMARY KEY,
+    Title VARCHAR(255),
+    Publisher_Name VARCHAR(255),
+    Pub_Year INT
+);
+
+-- Insert five tuples into the BOOK table
+INSERT INTO BOOK (Book_id, Title, Publisher_Name, Pub_Year)
+VALUES
+(1, 'The Great Gatsby', 'Scribner', 1925),
+(2, 'To Kill a Mockingbird', 'HarperCollins', 1960),
+(3, '1984', 'Secker & Warburg', 1949),
+(4, 'Pride and Prejudice', 'T. Egerton, Whitehall', 1813),
+(5, 'Harry Potter and the Philosopher''s Stone', 'Bloomsbury', 1997);
+
+-- Create the BOOK_AUTHORS table
+CREATE TABLE BOOK_AUTHORS (
+    Book_id INT,
+    Author_Name VARCHAR(255),
+    FOREIGN KEY (Book_id) REFERENCES BOOK(Book_id)
+);
+
+-- Insert five tuples into the BOOK_AUTHORS table
+INSERT INTO BOOK_AUTHORS (Book_id, Author_Name)
+VALUES
+(1, 'F. Scott Fitzgerald'),
+(2, 'Harper Lee'),
+(3, 'George Orwell'),
+(4, 'Jane Austen'),
+(5, 'J.K. Rowling');
+
+-- Create the PUBLISHER table
+CREATE TABLE PUBLISHER (
+    Name VARCHAR(255) PRIMARY KEY,
+    Address VARCHAR(255),
+    Phone VARCHAR(20)
+);
+
+-- Insert five tuples into the PUBLISHER table
+INSERT INTO PUBLISHER (Name, Address, Phone)
+VALUES
+('Scribner', '123 Main St, New York, NY', '123-456-7890'),
+('HarperCollins', '456 Broadway, New York, NY', '987-654-3210'),
+('Secker & Warburg', '789 Elm St, London', '456-789-0123'),
+('T. Egerton, Whitehall', '10 Downing St, London', '321-654-9870'),
+('Bloomsbury', '1 Diagon Alley, London', '789-012-3456');
+
+-- Create the BOOK_COPIES table
+CREATE TABLE BOOK_COPIES (
+    Book_id INT,
+    Program_ID INT,
+    No_of_Copies INT,
+    PRIMARY KEY (Book_id, Program_ID),
+    FOREIGN KEY (Book_id) REFERENCES BOOK(Book_id)
+);
+
+-- Insert five tuples into the BOOK_COPIES table
+INSERT INTO BOOK_COPIES (Book_id, Program_ID, No_of_Copies)
+VALUES
+(1, 1, 10),
+(2, 1, 8),
+(3, 2, 5),
+(4, 2, 3),
+(5, 3, 15);
+
+-- Create the BOOK_LENDING table
+CREATE TABLE BOOK_LENDING (
+    Book_id INT,
+    Program_ID INT,
+    Card_No INT,
+    Date_Out DATE,
+    Due_Date DATE,
+    PRIMARY KEY (Book_id, Program_ID, Card_No),
+    FOREIGN KEY (Book_id) REFERENCES BOOK(Book_id)
+);
+
+-- Insert five tuples into the BOOK_LENDING table
+INSERT INTO BOOK_LENDING (Book_id, Program_ID, Card_No, Date_Out, Due_Date)
+VALUES
+(1, 1, 123456, '2024-02-01', '2024-02-15'),
+(2, 1, 789012, '2024-02-02', '2024-02-16'),
+(3, 2, 345678, '2024-02-03', '2024-02-17'),
+(4, 2, 901234, '2024-02-04', '2024-02-18'),
+(5, 3, 567890, '2024-02-05', '2024-02-19');
+
+-- Create the LIBRARY_PROGRAM table
+CREATE TABLE LIBRARY_PROGRAM (
+    Program_ID INT PRIMARY KEY,
+    Program_Name VARCHAR(255),
+    Address VARCHAR(255)
+);
+
+-- Insert five tuples into the LIBRARY_PROGRAM table
+INSERT INTO LIBRARY_PROGRAM (Program_ID, Program_Name, Address)
+VALUES
+(1, 'Main Library', '123 Library St, City'),
+(2, 'Branch Library 1', '456 Library Rd, Town'),
+(3, 'Branch Library 2', '789 Library Ave, Village');
+
+
+
+
+
+SELECT LB.PROGRAM_NAME, B.BOOK_ID, TITLE, PUBLISHER_NAME, AUTHOR_NAME, 
+NO_OF_COPIES 
+ FROM BOOK B, BOOK_AUTHORS BA, BOOK_COPIES BC, LIBRARY_PROGRAM LB 
+ WHERE B.BOOK_ID = BA.BOOK_ID AND 
+ BA.BOOK_ID = BC.BOOK_ID AND 
+ BC.PROGRAM_ID = LB.PROGRAM_ID 
+ GROUP BY LB.PROGRAM_NAME, B.BOOK_ID, TITLE, PUBLISHER_NAME, AUTHOR_NAME, 
+ NO_OF_COPIES; 
+
+
+
+SELECT CARD_NO 
+FROM BOOK_LENDING 
+WHERE DATE_OUT BETWEEN '01-JAN-2017' AND '30-JUN-2017' 
+GROUP BY CARD_NO 
+HAVING COUNT (*) > 3; 
+
+
+DELETE FROM BOOK 
+WHERE BOOK_ID = '3333'; 
+1 row deleted. 
+
+
+
+SELECT BOOK_ID, TITLE, PUBLISHER_NAME, PUB_YEAR 
+FROM BOOK 
+GROUP BY PUB_YEAR, BOOK_ID, TITLE, PUBLISHER_NAME; 
+
+
+
+
+CREATE VIEW BOOKS_AVAILABLE AS 
+SELECT B. BOOK_ID, B. TITLE, C.NO_OF_COPIES 
+FROM LIBRARY_PROGRAM L, BOOK B, BOOK_COPIES C 
+WHERE B. BOOK_ID = C. BOOK_ID AND L. PROGRAM_ID = C. PROGRAM_ID; 
+
