@@ -1,0 +1,103 @@
+-- Create the SALESMAN table
+CREATE TABLE SALESMAN (
+    Salesman_id INT PRIMARY KEY,
+    Name VARCHAR(255),
+    City VARCHAR(255),
+    Commission DECIMAL(10, 2)
+);
+
+-- Insert five tuples into the SALESMAN table
+INSERT INTO SALESMAN (Salesman_id, Name, City, Commission)
+VALUES
+(1001, 'John Doe', 'New York', 0.15),
+(1002, 'Jane Smith', 'Los Angeles', 0.12),
+(1003, 'Michael Johnson', 'Chicago', 0.18),
+(1004, 'Emily Williams', 'Houston', 0.14),
+(1005, 'David Brown', 'Boston', 0.16);
+
+-- Create the CUSTOMER table
+CREATE TABLE CUSTOMER (
+    Customer_id INT PRIMARY KEY,
+    Cust_Name VARCHAR(255),
+    City VARCHAR(255),
+    Grade INT,
+    Salesman_id INT,
+    FOREIGN KEY (Salesman_id) REFERENCES SALESMAN(Salesman_id)
+);
+
+-- Insert five tuples into the CUSTOMER table
+INSERT INTO CUSTOMER (Customer_id, Cust_Name, City, Grade, Salesman_id)
+VALUES
+(2001, 'ABC Company', 'New York', 3, 1001),
+(2002, 'XYZ Corporation', 'Los Angeles', 2, 1002),
+(2003, 'LMN Industries', 'Chicago', 4, 1003),
+(2004, 'PQR Limited', 'Houston', 1, 1004),
+(2005, 'EFG Enterprises', 'Boston', 5, 1005);
+
+-- Create the ORDERS table
+CREATE TABLE ORDERS (
+    Ord_No INT PRIMARY KEY,
+    Purchase_Amt DECIMAL(10, 2),
+    Ord_Date DATE,
+    Customer_id INT,
+    Salesman_id INT,
+    FOREIGN KEY (Customer_id) REFERENCES CUSTOMER(Customer_id),
+    FOREIGN KEY (Salesman_id) REFERENCES SALESMAN(Salesman_id)
+);
+
+-- Insert five tuples into the ORDERS table
+INSERT INTO ORDERS (Ord_No, Purchase_Amt, Ord_Date, Customer_id, Salesman_id)
+VALUES
+(3001, 1500.00, '2023-01-10', 2001, 1001),
+(3002, 2200.50, '2023-02-15', 2002, 1002),
+(3003, 1800.75, '2023-03-20', 2003, 1003),
+(3004, 900.25, '2023-04-25', 2004, 1004),
+(3005, 3500.80, '2023-05-30', 2005, 1005);
+
+
+
+
+SELECT COUNT(CUSTOMER_ID) 
+FROM CUSTOMER 
+WHERE GRADE > (SELECT AVG(GRADE) 
+ FROM CUSTOMER 
+ WHERE CITY LIKE '%BENGALURU’); 
+
+
+
+
+SELECT NAME, COUNT(CUSTOMER_ID) 
+FROM SALESMAN S, CUSTOMER C 
+WHERE S.SALESMAN_ID = C.SALESMAN_ID 
+GROUP BY S.SALESMAN_ID, NAME 
+HAVING COUNT(CUSTOMER_ID) > 1; 
+
+
+
+
+(SELECT NAME 
+FROM SALESMAN S, CUSTOMER C 
+WHERE S.SALESMAN_ID=C.SALESMAN_ID AND S.CITY=C.CITY) 
+UNION 
+ (SELECT NAME 
+FROM SALESMAN 
+WHERE SALESMAN_ID NOT IN (SELECT S1.SALESMAN_ID 
+ FROM SALESMAN S1, CUSTOMER C1 
+ WHERE S1.SALESMAN_ID=C1.SALESMAN_ID AND 
+S1.CITY=C1.CITY)); 
+
+
+
+
+CREATE VIEW SALES_HIGHERORDER AS 
+SELECT SALESMAN_ID, PURCHASE_AMT 
+FROM ORDERS 
+WHERE PURCHASE_AMT= (SELECT MAX ( O.PURCHASE_AMT) 
+ FROM ORDERS O 
+ WHERE O.ORD_DATE = '12-APR-16')
+
+
+
+DELETE from salesman 
+WHERE salesman_id = 1000; 
+1 row deleted. 
